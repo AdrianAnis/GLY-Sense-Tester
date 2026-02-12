@@ -8,7 +8,6 @@ class HomeService {
     return data[Random().nextInt(data.length)];
   }
 }
-
 // import 'dart:convert';
 // import 'package:http/http.dart' as http;
 

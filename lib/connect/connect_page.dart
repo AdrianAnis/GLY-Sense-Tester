@@ -14,7 +14,7 @@ class _ConnectPageState extends State<ConnectPage> {
   bool isConnecting = false;
   String? deviceId;
 
-  final Guid glySenseServiceUUID = Guid("tentuindulumas");
+  final Guid glySenseServiceUUID = Guid("111111111");
 
   final TextEditingController codeController = TextEditingController();
 

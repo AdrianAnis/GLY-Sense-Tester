@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'home_service.dart';
+import 'widgets/status_card.dart';
+import 'widgets/device_status_card.dart';
+import 'widgets/health_card.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -9,82 +11,133 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final HomeService service = HomeService();
-
-  String? statusGlikemik;
-  bool isLoading = true;
-
-  @override
-  void initState() {
-    super.initState();
-    loadData();
-  }
-
-  Future<void> loadData() async {
-    final result = await service.fetchGlikemikStatus();
-    setState(() {
-      statusGlikemik = result;
-      isLoading = false;
-    });
-  }
-
-  Color getStatusColor(String status) {
-    switch (status) {
-      case "rendah":
-        return Colors.green;
-      case "sedang":
-        return Colors.orange;
-      case "tinggi":
-        return Colors.red;
-      default:
-        return Colors.grey;
-    }
-  }
+  int _selectedIndex = 0;
 
   @override
   Widget build(BuildContext context) {
+    final String status = "tinggi";
+    final double heartRate = 72;
+    final double spo2 = 98;
+
     return Scaffold(
-      appBar: AppBar(title: const Text("Gly-Sense")),
-      body: Center(
-        child: isLoading
-            ? const CircularProgressIndicator()
-            : Container(
+      backgroundColor: Colors.white,
+      body: _selectedIndex == 0
+          ? SafeArea(
+              child: Padding(
                 padding: const EdgeInsets.all(24),
-                margin: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: getStatusColor(statusGlikemik!).withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: getStatusColor(statusGlikemik!),
-                    width: 2,
-                  ),
-                ),
                 child: Column(
-                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      "Status Glikemik",
-                      style: TextStyle(fontSize: 18),
+                    const SizedBox(height: 8),
+
+                    /// HEADER
+                    Row(
+                      children: [
+                        Image.asset(
+                          'assets/images/fotoprofile.png',
+                          width: 50,
+                          height: 50,
+                        ),
+                        const SizedBox(width: 11),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: const [
+                            Text(
+                              "Selamat Siang,",
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                                fontFamily: 'Poppins',
+                              ),
+                            ),
+                            Text(
+                              "Lambertus Siregar",
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                fontFamily: 'Poppins',
+                              ),
+                            ),
+                          ],
+                        ),
+                        const Spacer(),
+                        Image.asset('assets/icons/notif.png'),
+                      ],
                     ),
-                    const SizedBox(height: 12),
-                    Text(
-                      statusGlikemik!.toUpperCase(),
+
+                    const SizedBox(height: 36),
+
+                    StatusCard(status: status),
+
+                    const SizedBox(height: 24),
+
+                    const DeviceStatusCard(),
+
+                    const SizedBox(height: 40),
+
+                    const Text(
+                      "Kondisi Terkini",
                       style: TextStyle(
-                        fontSize: 32,
+                        fontSize: 14,
                         fontWeight: FontWeight.bold,
-                        color: getStatusColor(statusGlikemik!),
                       ),
                     ),
-                    const SizedBox(height: 12),
-                    const SizedBox(height: 16),
-                    ElevatedButton(
-                      onPressed: loadData,
-                      child: const Text("Refresh Data"),
+
+                    const SizedBox(height: 30),
+
+                    Row(
+                      children: [
+                        Expanded(
+                          child: HealthCard(
+                            title: "Detak Jantung",
+                            value: heartRate.toStringAsFixed(0),
+                            unit: "bpm",
+                            imagepath: 'assets/icons/jantung.png',
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: HealthCard(
+                            title: "Saturasi Oksigen",
+                            value: spo2.toStringAsFixed(0),
+                            unit: "%",
+                            imagepath: 'assets/icons/oksigen.png',
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
               ),
+            )
+          : _buildPlaceholderPage(),
+      bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: Colors.white,
+        currentIndex: _selectedIndex,
+        onTap: (index) {
+          setState(() {
+            _selectedIndex = index;
+          });
+        },
+        type: BottomNavigationBarType.fixed,
+        selectedItemColor: const Color(0xFFE391DA),
+        unselectedItemColor: Colors.grey,
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
+          BottomNavigationBarItem(icon: Icon(Icons.history), label: "Riwayat"),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.menu_book),
+            label: "Edukasi",
+          ),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
+        ],
       ),
+    );
+  }
+
+  Widget _buildPlaceholderPage() {
+    return const Center(
+      child: Text("Coming Soon", style: TextStyle(fontSize: 18)),
     );
   }
 }
