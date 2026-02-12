@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../home/home_page.dart';
+import '../home/pages/home_page.dart';
 
 class ConnectPage extends StatefulWidget {
   const ConnectPage({super.key});

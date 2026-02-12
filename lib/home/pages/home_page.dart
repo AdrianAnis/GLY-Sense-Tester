@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'widgets/status_card.dart';
-import 'widgets/device_status_card.dart';
-import 'widgets/health_card.dart';
+import 'package:glysense_prototipe/home/services/home_service.dart';
+import '../widgets/status_card.dart';
+import '../widgets/device_status_card.dart';
+import '../widgets/health_card.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -13,11 +14,54 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
 
+  String status = "";
+  double heartRate = 0;
+  double spo2 = 0;
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    print('init state jalan');
+    fetchData();
+  }
+
+  void fetchData() async {
+    print("FETCH DATA DIPANGGIL");
+    await Future.delayed(const Duration(seconds: 2));
+
+    setState(() {
+      status = "rendah";
+      heartRate = 85;
+      spo2 = 96;
+      isLoading = false;
+    });
+
+    print("SETSTATE SELESAI");
+  }
+
+  // void fetchData() async {
+  //   try {
+  //     final service = HomeService();
+  //     final result = await service.fetchHealthData("GLYSENSE-001");
+
+  //     setState(() {
+  //       status = result.status;
+  //       heartRate = result.heartRate;
+  //       spo2 = result.spo2;
+  //       isLoading = false;
+  //     });
+  //   } catch (e) {
+  //     print("ERROR: $e");
+  //   }
+  // }
+
+
   @override
   Widget build(BuildContext context) {
-    final String status = "tinggi";
-    final double heartRate = 72;
-    final double spo2 = 98;
+    if (isLoading) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
 
     return Scaffold(
       backgroundColor: Colors.white,
