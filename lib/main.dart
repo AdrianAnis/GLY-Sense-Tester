@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:glysense_prototipe/connect/connect_page.dart';
 import 'home/pages/home_page.dart';
 
 void main() {
@@ -14,7 +15,7 @@ class GlySenseApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Gly-Sense',
       theme: ThemeData(primarySwatch: Colors.blue, useMaterial3: true),
-      home: HomePage(),
+      home: ConnectPage(),
     );
   }
 }

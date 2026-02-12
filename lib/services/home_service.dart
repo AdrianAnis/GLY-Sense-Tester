@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:glysense_prototipe/home/models/home_model.dart';
+import 'package:glysense_prototipe/models/home_model.dart';
 import 'package:http/http.dart' as http;
 
 class HomeService {

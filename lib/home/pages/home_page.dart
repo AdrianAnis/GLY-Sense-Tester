@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:glysense_prototipe/home/services/home_service.dart';
+import 'package:glysense_prototipe/services/home_service.dart';
 import '../widgets/status_card.dart';
 import '../widgets/device_status_card.dart';
 import '../widgets/health_card.dart';

@@ -1,119 +1,67 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_blue_plus/flutter_blue_plus.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import '../home/pages/home_page.dart';
 
-class ConnectPage extends StatefulWidget {
+class ConnectPage extends StatelessWidget {
   const ConnectPage({super.key});
-
-  @override
-  State<ConnectPage> createState() => _ConnectPageState();
-}
-
-class _ConnectPageState extends State<ConnectPage> {
-  bool isConnecting = false;
-  String? deviceId;
-
-  final Guid glySenseServiceUUID = Guid("111111111");
-
-  final TextEditingController codeController = TextEditingController();
-
-  @override
-  void initState() {
-    super.initState();
-    checkSavedDevice();
-  }
-
-  Future<void> checkSavedDevice() async {
-    final prefs = await SharedPreferences.getInstance();
-    final savedId = prefs.getString('device_id');
-
-    if (savedId != null) {
-      deviceId = savedId;
-      startScan();
-    }
-  }
-
-  Future<void> saveDeviceId(String id) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('device_id', id);
-    deviceId = id;
-  }
-
-  void startScan() async {
-    setState(() => isConnecting = true);
-
-    FlutterBluePlus.startScan(timeout: const Duration(seconds: 6));
-
-    FlutterBluePlus.scanResults.listen((results) async {
-      for (final r in results) {
-        if (r.advertisementData.serviceUuids.contains(
-          glySenseServiceUUID.toString(),
-        )) {
-          FlutterBluePlus.stopScan();
-
-          await r.device.connect(autoConnect: false);
-
-          if (!mounted) return;
-
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (_) => const HomePage()),
-          );
-          break;
-        }
-      }
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Hubungkan Gly-Sense")),
-      body: Center(
+      backgroundColor: Colors.white,
+      body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: isConnecting
-              ? Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: const [
-                    CircularProgressIndicator(),
-                    SizedBox(height: 16),
-                    Text("Mencari gelang Gly-Sense..."),
-                  ],
-                )
-              : Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Text(
-                      "Masukkan Kode Gelang",
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    TextField(
-                      controller: codeController,
-                      textAlign: TextAlign.center,
-                      decoration: const InputDecoration(
-                        hintText: "apalah",
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    ElevatedButton(
-                      onPressed: () async {
-                        final code = codeController.text.trim();
-                        if (code.isEmpty) return;
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Column(
+            children: [
+              const SizedBox(height: 32),
 
-                        await saveDeviceId(code);
-                        startScan();
-                      },
-                      child: const Text("Hubungkan Gelang"),
+              /// TITLE
+              const Text(
+                "Hubungkan Wristband",
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 40),
+              Image.asset('assets/images/wristband.png'),
+              const SizedBox(height: 12),
+              const Text(
+                "Hubungkan Wristband Anda",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                "Pastikan Bluetooth Anda aktif dan perangkat GLY\n-Sense berada di dekat ponsel Anda untuk mulai\n deteksi ",
+                style: TextStyle(fontSize: 13, color: Colors.grey, height: 1.5),
+                textAlign: TextAlign.center,
+              ),
+
+              const Spacer(),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    //logic connect
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFE391DA),
+                    padding: const EdgeInsets.symmetric(vertical: 18),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(40),
                     ),
-                  ],
+                  ),
+                  child: const Text(
+                    "Hubungkan Perangkat",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                      color: Colors.white,
+                    ),
+                  ),
                 ),
+              ),
+
+              const SizedBox(height: 28),
+            ],
+          ),
         ),
       ),
     );
