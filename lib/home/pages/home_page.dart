@@ -19,7 +19,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
 
-  String status = "";
+  String status = "AMAN";
   double heartRate = 0;
   double spo2 = 0;
   bool isLoading = true;
@@ -27,13 +27,43 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+
+    service = HomeService();
+
     startListening();
+    listenApiResult();
   }
 
   @override
   void dispose() {
     dataSub.cancel();
+    apiSub.cancel();
+    service.dispose();
     super.dispose();
+  }
+
+  late StreamSubscription apiSub;
+
+  void listenApiResult() {
+    apiSub = service.resultStream.listen((result) {
+      print("🔥 HASIL API MASUK: $result");
+
+      try {
+        if (result is List && result.isNotEmpty) {
+          final data = result[0];
+
+          final newStatus = data["analisa_hybrid"]?["status"];
+
+          if (newStatus != null) {
+            setState(() {
+              status = newStatus.toString();
+            });
+          }
+        }
+      } catch (e) {
+        print("❌ Parsing error: $e");
+      }
+    });
   }
 
   // void fetchData() async {
@@ -67,45 +97,45 @@ class _HomePageState extends State<HomePage> {
   // }
 
   late StreamSubscription<HomeModel> dataSub;
+  late HomeService service;
 
   void startListening() {
-    final service = HomeService();
-
     dataSub = service.listenToHealthData(widget.device).listen((result) {
       setState(() {
-        status = "AMAN"; // ini nanti API Call
+        // ❌ HAPUS ini
+        // status = ...
 
-        // Filter heartRate supaya hanya angka
-        List<num> validHeartRate = result.heartRate
-            .map((e) {
-              if (e == null) return null;
-              if (e is num) return e;
-              if (e is String) return num.tryParse(e);
-              return null;
-            })
-            .where((e) => e != null)
-            .cast<num>()
-            .toList();
+        // Filter heartRate
+        // List<num> validHeartRate = result.heartRate
+        //     .map((e) {
+        //       if (e == null) return null;
+        //       if (e is num) return e;
+        //       if (e is String) return num.tryParse(e);
+        //       return null;
+        //     })
+        //     .where((e) => e != null)
+        //     .cast<num>()
+        //     .toList();
 
-        heartRate = validHeartRate.isNotEmpty
-            ? validHeartRate.reduce((a, b) => a + b) / validHeartRate.length
-            : 0;
+        // heartRate = validHeartRate.isNotEmpty
+        //     ? validHeartRate.reduce((a, b) => a + b) / validHeartRate.length
+        //     : 0;
 
-        // Filter spo2 supaya hanya angka
-        List<num> validSpO2 = result.spo2
-            .map((e) {
-              if (e == null) return null;
-              if (e is num) return e;
-              if (e is String) return num.tryParse(e);
-              return null;
-            })
-            .where((e) => e != null)
-            .cast<num>()
-            .toList();
+        // // Filter spo2
+        // List<num> validSpO2 = result.spo2
+        //     .map((e) {
+        //       if (e == null) return null;
+        //       if (e is num) return e;
+        //       if (e is String) return num.tryParse(e);
+        //       return null;
+        //     })
+        //     .where((e) => e != null)
+        //     .cast<num>()
+        //     .toList();
 
-        spo2 = validSpO2.isNotEmpty
-            ? validSpO2.reduce((a, b) => a + b) / validSpO2.length
-            : 0;
+        // spo2 = validSpO2.isNotEmpty
+        //     ? validSpO2.reduce((a, b) => a + b) / validSpO2.length
+        //     : 0;
 
         isLoading = false;
       });
